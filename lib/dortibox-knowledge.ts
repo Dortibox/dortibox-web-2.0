@@ -5,135 +5,263 @@ export async function buildKnowledgeContext(): Promise<string> {
     const client = await clientPromise;
     const db = client.db();
 
-    // Run all queries in parallel
-    const [serviceStats, activeServices, frequencies, zones] =
-      await Promise.all([
-        // Total subscriber counts
-        db
-          .collection("services")
-          .aggregate([
-            {
-              $group: {
-                _id: "$status",
-                count: { $sum: 1 },
-              },
+    const [
+      serviceStats,
+      subscriptionStats,
+      oneOffStats,
+      recentServices,
+      communities,
+      binPrices,
+      wastePrices,
+    ] = await Promise.all([
+      // Overall service status breakdown
+      db
+        .collection("services")
+        .aggregate([
+          { $match: { delete: false } },
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
             },
-          ])
-          .toArray(),
+          },
+        ])
+        .toArray(),
 
-        // Active services with bin sizes and frequencies
-        db
-          .collection("services")
-          .aggregate([
-            { $match: { status: "active" } },
-            {
-              $group: {
-                _id: {
-                  binSize: "$binSize",
-                  frequencyId: "$frequencyId",
-                },
-                count: { $sum: 1 },
-              },
+      // Subscription-specific stats
+      db
+        .collection("services")
+        .aggregate([
+          {
+            $match: {
+              delete: false,
+              serviceType: "SUBSCRIPTION",
+              status: "ACTIVATED",
             },
-            { $limit: 20 },
-          ])
-          .toArray(),
-
-        // Available frequencies
-        db
-          .collection("frequencies")
-          .find(
-            {},
-            {
-              projection: {
-                name: 1,
-                description: 1,
-                timesPerWeek: 1,
-                price: 1,
-              },
+          },
+          {
+            $group: {
+              _id: "$paymentStatus",
+              count: { $sum: 1 },
+              totalRevenue: { $sum: "$totalAmount" },
             },
-          )
-          .toArray(),
+          },
+        ])
+        .toArray(),
 
-        // Active zones/communities
-        db
-          .collection("zones")
-          .find({ active: true }, { projection: { name: 1, code: 1, ward: 1 } })
-          .toArray(),
-      ]);
+      // One-off pickup stats
+      db
+        .collection("services")
+        .aggregate([
+          {
+            $match: {
+              delete: false,
+              serviceType: "ONE_OFF_PICKUP",
+            },
+          },
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
+            },
+          },
+        ])
+        .toArray(),
 
-    // Calculate totals
-    const totalActive =
-      serviceStats.find((s) => s._id === "active")?.count || 0;
-    const totalPending =
-      serviceStats.find((s) => s._id === "pending")?.count || 0;
-    const totalAll = serviceStats.reduce((sum, s) => sum + s.count, 0);
+      // Payment method breakdown for active services
+      db
+        .collection("services")
+        .aggregate([
+          {
+            $match: {
+              delete: false,
+              status: "ACTIVATED",
+              paymentStatus: "SUCCESS",
+            },
+          },
+          {
+            $group: {
+              _id: "$paymentMethod",
+              count: { $sum: 1 },
+            },
+          },
+        ])
+        .toArray(),
 
-    // Format zones
+      // Active communities
+      db
+        .collection("communities")
+        .find({}, { projection: { name: 1, _id: 0 } })
+        .toArray(),
+
+      // Bin pricing plans
+      db
+        .collection("binprices")
+        .find(
+          { status: "ACTIVATED" },
+          {
+            projection: {
+              price: 1,
+              currency: 1,
+              planDuration: 1,
+              type: 1,
+              _id: 0,
+            },
+          },
+        )
+        .limit(20)
+        .toArray(),
+
+      // Waste volume pricing
+      db
+        .collection("wastevolumeprices")
+        .find(
+          { active: true, delete: false },
+          {
+            projection: {
+              minVolume: 1,
+              maxVolume: 1,
+              price: 1,
+              locationType: 1,
+              unit: 1,
+              _id: 0,
+            },
+          },
+        )
+        .toArray(),
+    ]);
+
+    // Process service stats
+    const statusMap: Record<string, number> = {};
+    serviceStats.forEach((s) => {
+      statusMap[s._id] = s.count;
+    });
+
+    const totalActive = statusMap["ACTIVATED"] || 0;
+    const totalPending = statusMap["PENDING"] || 0;
+    const totalCompleted = statusMap["COMPLETED"] || 0;
+    const totalCancelled = statusMap["CANCELLED"] || 0;
+    const totalAll = Object.values(statusMap).reduce((a, b) => a + b, 0);
+
+    // Process subscription stats
+    const subPaidCount =
+      subscriptionStats.find((s) => s._id === "SUCCESS")?.count || 0;
+    const subPaidRevenue =
+      subscriptionStats.find((s) => s._id === "SUCCESS")?.totalRevenue || 0;
+
+    // Process one-off stats
+    const oneOffMap: Record<string, number> = {};
+    oneOffStats.forEach((s) => {
+      oneOffMap[s._id] = s.count;
+    });
+
+    // Process payment methods
+    const paymentMap: Record<string, number> = {};
+    recentServices.forEach((s) => {
+      paymentMap[s._id] = s.count;
+    });
+
+    // Format communities
     const communityNames =
-      zones.length > 0
-        ? zones.map((z) => z.name).join(", ")
+      communities.length > 0
+        ? communities
+            .map((c) => c.name)
+            .filter(Boolean)
+            .join(", ")
         : "Sorie Town, Albert Academy, Kroo Town, Sanders Brook, Central, Murray Town, Brookfields";
 
-    // Format frequencies
-    const frequencyList =
-      frequencies.length > 0
-        ? frequencies
-            .map(
-              (f) =>
-                `${f.name}: ${f.description || ""} ${f.price ? `(${f.price} SLE)` : ""}`,
-            )
+    // Format bin prices
+    const binPriceList =
+      binPrices.length > 0
+        ? binPrices
+            .filter((b) => b.planDuration)
+            .map((b) => `${b.planDuration}: ${b.price} ${b.currency || "SLE"}`)
             .join("\n  ")
-        : "Weekly (1x per week), Bi-weekly (2x per week), Daily (6x per week)";
+        : "1 Month: 200 SLE\n  3 Months: 585 SLE (save 2.5%)\n  12 Months: 2,280 SLE (save 5%)";
 
-    // Format bin size distribution
-    const binSizeMap: Record<string, number> = {};
-    activeServices.forEach((s) => {
-      const size = s._id?.binSize || "Unknown";
-      binSizeMap[size] = (binSizeMap[size] || 0) + s.count;
-    });
-    const binSizeList = Object.entries(binSizeMap)
-      .map(([size, count]) => `${size}: ${count} active subscriptions`)
-      .join(", ");
+    // Format waste volume prices
+    const householdPrices = wastePrices.filter(
+      (w) => w.locationType === "HOUSEHOLD",
+    );
+    const businessPrices = wastePrices.filter(
+      (w) => w.locationType === "BUSINESS",
+    );
 
-    // Build the context document
+    const formatVolumePrices = (prices: typeof wastePrices) =>
+      prices
+        .map((p) => `${p.minVolume}-${p.maxVolume} ${p.unit}: ${p.price} SLE`)
+        .join("\n  ");
+
+    // Build context document
     const context = `
 ## LIVE DORTIBOX PLATFORM DATA
 Last updated: ${new Date().toISOString()}
 
-### Subscriber Statistics
-- Total registered services: ${totalAll}
+### Platform Statistics
+- Total services (all time): ${totalAll}
 - Active subscriptions: ${totalActive}
-- Pending subscriptions: ${totalPending}
+- Pending services: ${totalPending}
+- Completed services: ${totalCompleted}
+- Cancelled services: ${totalCancelled}
 
-### Service Coverage
-- Active communities: ${communityNames}
-- Coverage area: Block 6, Central Business District, Freetown
+### Active Paid Subscriptions
+- Paid and active: ${subPaidCount}
+- Total revenue from active subscriptions: ${subPaidRevenue.toLocaleString()} SLE
 
-### Available Bin Sizes
-${binSizeList || "120 Ltr, 240 Ltr, 660 Ltr, 1000 Ltr"}
+### One-Off Pickup Requests
+- Active: ${oneOffMap["ACTIVATED"] || 0}
+- Completed: ${oneOffMap["COMPLETED"] || 0}
+- Pending: ${oneOffMap["PENDING"] || 0}
 
-### Collection Frequencies
-  ${frequencyList}
+### Payment Methods Used (Active Services)
+${
+  Object.entries(paymentMap)
+    .map(([method, count]) => `- ${method}: ${count} services`)
+    .join("\n") || "- Orange Money and Afrimoney accepted"
+}
 
-### Subscription Plans
-- 1 Month: 200 SLE (4 pickups)
-- 3 Months: 585 SLE (save 2.5%)
-- 12 Months: 2,280 SLE (save 5%)
+### Service Coverage — Active Communities
+${communityNames}
+Coverage area: Block 6, Central Business District, Freetown, Sierra Leone
 
-### Payment Methods
+### Subscription Plans & Pricing
+  ${binPriceList}
+
+### Waste Volume Pricing
+Household:
+  ${householdPrices.length > 0 ? formatVolumePrices(householdPrices) : "Contact us for household pricing"}
+
+Business / Commercial:
+  ${businessPrices.length > 0 ? formatVolumePrices(businessPrices) : "Contact us for commercial pricing"}
+
+### Service Types Available
+- SUBSCRIPTION: Regular scheduled waste collection (weekly, bi-weekly, daily)
+- ONE_OFF_PICKUP: Single one-time pickup request
+- RECURRING: Recurring scheduled service
+
+### Pickup Types
+- DOMESTIC: Household residential collection
+- COMMERCIAL: Business and commercial collection
+- INSTITUTIONS: Schools, NGOs, and institutional collection
+
+### Payment Methods Accepted
 - Orange Money (via USSD: *715*380#)
 - Afrimoney (via USSD: *715*380#)
+- Payment status tracked as: PENDING → SUCCESS
+
+### How to Register
+1. Download the DortiBox app (Google Play or App Store)
+2. Register with your Sierra Leone phone number
+3. Select your address and bin size
+4. Choose your subscription plan
+5. Pay via Orange Money or Afrimoney
+- No smartphone? Dial *715*380# from any Sierra Leonean mobile number
 
 ### Contact Information
 - Phone: +232 76 242 328
 - Email: info@fwtsl.net
 - Address: BSI Offices, 55A Wilkinson Road, Third Floor, Freetown
-- USSD (no smartphone needed): *715*380#
-
-### App Download
-- Google Play: Available
-- App Store: Available
+- USSD: *715*380#
 - Website: dortibox.com
 `.trim();
 
@@ -141,39 +269,42 @@ ${binSizeList || "120 Ltr, 240 Ltr, 660 Ltr, 1000 Ltr"}
   } catch (err) {
     console.error("Knowledge base error:", err);
 
-    // Fallback static knowledge if DB is unreachable
+    // Static fallback if DB is unreachable
     return `
-## DORTIBOX PLATFORM DATA (Static Fallback)
+## DORTIBOX PLATFORM DATA (Fallback)
 
 ### Service Coverage
-- Communities: Sorie Town, Albert Academy, Kroo Town, Sanders Brook, Central, Murray Town, Brookfields
-- Coverage area: Block 6, Central Business District, Freetown
+Communities: Sorie Town, Albert Academy, Kroo Town, Sanders Brook, Central, Murray Town, Brookfields
+Coverage area: Block 6, Central Business District, Freetown
 
 ### Subscription Plans
-- 1 Month: 200 SLE (4 pickups per month)
+- 1 Month: 200 SLE (4 pickups)
 - 3 Months: 585 SLE (save 2.5%)
 - 12 Months: 2,280 SLE (save 5%)
 
-### Bin Sizes Available
-- 120 Ltr (Standard household)
-- 240 Ltr (Large household / small business)
-- 660 Ltr (Commercial)
-- 1000 Ltr (Large commercial)
+### Service Types
+- Regular Subscription: Scheduled weekly pickups
+- One-Off Pickup: Single pickup request
 
-### Collection Frequencies
-- Weekly (1x per week)
-- Bi-weekly (2x per week)
-- Daily (6x per week)
+### Pickup Types
+- Domestic (Household)
+- Commercial (Business)
+- Institutional (Schools, NGOs)
 
 ### Payment Methods
-- Orange Money (via USSD: *715*380#)
-- Afrimoney (via USSD: *715*380#)
+- Orange Money (USSD: *715*380#)
+- Afrimoney (USSD: *715*380#)
 
-### Contact Information
+### How to Register
+1. Download DortiBox app (Google Play or App Store)
+2. Register with your phone number
+3. Choose your plan and pay via mobile money
+- No smartphone? Dial *715*380#
+
+### Contact
 - Phone: +232 76 242 328
 - Email: info@fwtsl.net
-- Address: BSI Offices, 55A Wilkinson Road, Third Floor, Freetown
-- USSD (no smartphone needed): *715*380#
+- USSD: *715*380#
 `.trim();
   }
 }
