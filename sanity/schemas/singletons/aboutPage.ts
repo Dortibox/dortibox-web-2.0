@@ -4,7 +4,6 @@ export const aboutPage = defineType({
   name: "aboutPage",
   title: "About Page",
   type: "document",
-  __experimental_actions: ["update", "publish"],
   fields: [
     defineField({
       name: "hero",
@@ -13,7 +12,12 @@ export const aboutPage = defineType({
       fields: [
         { name: "headline", type: "string", title: "Headline" },
         { name: "subheading", type: "text", title: "Subheading", rows: 2 },
-        { name: "image", type: "image", title: "Hero Image", options: { hotspot: true } },
+        {
+          name: "image",
+          type: "image",
+          title: "Hero Image",
+          options: { hotspot: true },
+        },
       ],
     }),
     defineField({
@@ -43,7 +47,12 @@ export const aboutPage = defineType({
           type: "object",
           fields: [
             { name: "title", type: "string", title: "Value Title" },
-            { name: "description", type: "text", title: "Description", rows: 2 },
+            {
+              name: "description",
+              type: "text",
+              title: "Description",
+              rows: 2,
+            },
             { name: "icon", type: "string", title: "Icon name (Lucide)" },
           ],
           preview: { select: { title: "title" } },

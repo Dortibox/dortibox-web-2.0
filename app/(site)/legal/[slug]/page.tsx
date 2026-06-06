@@ -5,7 +5,7 @@ import { PortableTextRenderer } from "@/components/ui/PortableTextRenderer";
 import { formatDate } from "@/lib/utils";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
@@ -14,7 +14,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const page = await getLegalPageBySlug(params.slug).catch(() => null);
+  const { slug } = await params;
+  const page = await getLegalPageBySlug(slug).catch(() => null);
   if (!page) return { title: "Legal" };
   return {
     title: page.title,
@@ -23,7 +24,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function LegalPage({ params }: Props) {
-  const page = await getLegalPageBySlug(params.slug).catch(() => null);
+  const { slug } = await params;
+  const page = await getLegalPageBySlug(slug).catch(() => null);
 
   if (!page) notFound();
 

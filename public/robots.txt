@@ -1,0 +1,11 @@
+# *
+User-agent: *
+Allow: /
+Disallow: /studio
+Disallow: /api
+
+# Host
+Host: https://dortibox.com
+
+# Sitemaps
+Sitemap: https://dortibox.com/sitemap.xml

@@ -4,7 +4,6 @@ export const impactPage = defineType({
   name: "impactPage",
   title: "Impact Page",
   type: "document",
-  __experimental_actions: ["update", "publish"],
   fields: [
     defineField({
       name: "hero",
