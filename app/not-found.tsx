@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Home, ArrowLeft, Search } from "lucide-react";
+import { Home, Search } from "lucide-react";
+import { BackButton } from "@/components/ui/BackButton";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-forest-deeper flex items-center justify-center relative overflow-hidden">
-      {/* Background decorations */}
       <div className="absolute -right-32 -top-32 w-[500px] h-[500px] rounded-full bg-forest opacity-20 pointer-events-none" />
       <div className="absolute -left-20 bottom-0 w-[350px] h-[350px] rounded-full bg-amber opacity-10 pointer-events-none" />
 
@@ -21,7 +21,6 @@ export default function NotFound() {
           </div>
         </div>
 
-        {/* Content */}
         <div className="inline-flex items-center gap-2 bg-forest/40 border border-forest-mid/40 rounded-full px-4 py-2 mb-6">
           <span className="w-2 h-2 rounded-full bg-amber" />
           <span className="text-sage text-sm font-body">Page Not Found</span>
@@ -64,13 +63,7 @@ export default function NotFound() {
             <Home size={18} />
             Go to Homepage
           </Link>
-          <button
-            onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full border-2 border-white/30 text-white font-heading font-semibold text-base hover:border-white hover:bg-white/10 transition-all duration-200"
-          >
-            <ArrowLeft size={18} />
-            Go Back
-          </button>
+          <BackButton />
         </div>
 
         {/* USSD reminder */}

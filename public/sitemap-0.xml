@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
-<url><loc>https://dortibox.com/partners</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/blog</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/team</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/impact</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/about</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/contact</loc><lastmod>2026-06-06T07:20:51.949Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/legal/privacy-policy</loc><lastmod>2026-06-06T07:20:51.950Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/legal/terms-and-conditions</loc><lastmod>2026-06-06T07:20:51.950Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/blog/dortibox-2-0-is-here</loc><lastmod>2026-06-06T07:20:51.950Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
-<url><loc>https://dortibox.com/blog/kroo-town-weekly-reliability</loc><lastmod>2026-06-06T07:20:51.950Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/team</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/partners</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/gallery</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/contact</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/impact</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/about</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/blog</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/legal/privacy-policy</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/legal/terms-and-conditions</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/blog/dortibox-2-0-is-here</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
+<url><loc>https://dortibox.com/blog/kroo-town-weekly-reliability</loc><lastmod>2026-06-06T10:55:30.698Z</lastmod><changefreq>daily</changefreq><priority>0.7</priority></url>
 </urlset>
