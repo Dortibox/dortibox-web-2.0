@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/sections/ContactForm";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { getFaqs } from "@/sanity/lib/queries";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -13,6 +15,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ContactPage() {
-  return <ContactForm />;
+export default async function ContactPage() {
+  const faqs = await getFaqs();
+
+  return (
+    <>
+      <ContactForm />
+      <FAQSection faqs={faqs} />
+    </>
+  );
 }

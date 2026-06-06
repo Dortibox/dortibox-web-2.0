@@ -59,6 +59,29 @@ export const aboutPage = defineType({
         },
       ],
     }),
+    defineField({
+      name: "ceoSection",
+      title: "Word from Our CEO",
+      type: "object",
+      fields: [
+        { name: "name", type: "string", title: "CEO Name" },
+        { name: "role", type: "string", title: "Role / Title" },
+        {
+          name: "photo",
+          type: "image",
+          title: "CEO Photo",
+          options: { hotspot: true },
+        },
+        { name: "quote", type: "text", title: "Opening Quote", rows: 2 },
+        {
+          name: "body",
+          type: "array",
+          title: "Message Body",
+          of: [{ type: "block" }],
+        },
+        { name: "linkedin", type: "url", title: "LinkedIn URL" },
+      ],
+    }),
   ],
   preview: {
     prepare() {

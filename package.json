@@ -21,6 +21,7 @@
     "next": "15.1.11",
     "next-sanity": "^8.2.1",
     "next-sitemap": "^4.2.3",
+    "openai": "^6.42.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-is": "^19.2.7",

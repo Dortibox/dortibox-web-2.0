@@ -12,6 +12,8 @@ import { customer } from "./documents/customer";
 import { partner } from "./documents/partner";
 import { testimonial } from "./documents/testimonial";
 import { legalPage } from "./documents/legalPage";
+import { faqItem } from "./documents/faqItem";
+import { galleryItem } from "./documents/galleryItem";
 
 export const schemaTypes = [
   // Singletons first (appear at top of Studio sidebar)
@@ -28,4 +30,6 @@ export const schemaTypes = [
   partner,
   testimonial,
   legalPage,
+  faqItem,
+  galleryItem,
 ];

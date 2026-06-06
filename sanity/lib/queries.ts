@@ -81,17 +81,68 @@ export async function getHomePage() {
 
 // ─── About Page ───────────────────────────────────────────────────────────────
 export async function getAboutPage() {
-  return client.fetch(
-    `*[_type == "aboutPage"][0]{
-      hero{ headline, subheading, image },
-      story,
-      vision,
-      mission,
-      values[]{ title, description, icon }
-    }`,
-    {},
-    { next: { tags: ["aboutPage"] } },
-  );
+  try {
+    return await client.fetch(
+      `*[_type == "aboutPage"][0]{
+        hero{ headline, subheading, image },
+        story,
+        vision,
+        mission,
+        values[]{ title, description, icon },
+        ceoSection{
+          name,
+          role,
+          photo,
+          quote,
+          body,
+          linkedin
+        }
+      }`,
+      {},
+      { next: { tags: ["aboutPage"] } },
+    );
+  } catch {
+    return null;
+  }
+}
+
+// FAQ
+export async function getFaqs() {
+  try {
+    return await client.fetch(
+      `*[_type == "faqItem"] | order(featured desc, order asc){
+        _id,
+        question,
+        answer,
+        category,
+        featured
+      }`,
+      {},
+      { next: { tags: ["faqItem"] } },
+    );
+  } catch {
+    return [];
+  }
+}
+
+// ---- GALLERY
+export async function getGalleryItems() {
+  try {
+    return await client.fetch(
+      `*[_type == "galleryItem"] | order(featured desc, order asc){
+        _id,
+        title,
+        description,
+        image,
+        category,
+        featured
+      }`,
+      {},
+      { next: { tags: ["galleryItem"] } }
+    );
+  } catch {
+    return [];
+  }
 }
 
 // ─── Team ─────────────────────────────────────────────────────────────────────
