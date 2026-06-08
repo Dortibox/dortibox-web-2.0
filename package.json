@@ -28,7 +28,7 @@
     "react-dom": "^19.2.7",
     "react-is": "^19.2.7",
     "resend": "^6.12.4",
-    "sanity": "^3.99.0",
+    "sanity": "^5.30.0",
     "styled-components": "^6.4.2",
     "tailwind-merge": "^2.6.0"
   },
