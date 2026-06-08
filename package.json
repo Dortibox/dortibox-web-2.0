@@ -16,6 +16,7 @@
     "@sanity/icons": "^3.7.4",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^3.99.0",
+    "@vercel/speed-insights": "^2.0.0",
     "autoprefixer": "^10.5.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.469.0",
