@@ -17,6 +17,7 @@ const footerNav = {
     { label: "For Businesses", href: "/partners#business" },
   ],
   Support: [
+    { label: "Support", href: "/support" },
     { label: "Contact Us", href: "/contact" },
     { label: "Delete Account", href: "/delete-account" },
     { label: "Privacy Policy", href: "/legal/privacy-policy" },
